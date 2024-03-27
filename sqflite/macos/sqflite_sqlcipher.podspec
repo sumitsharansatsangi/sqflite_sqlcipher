@@ -24,4 +24,5 @@ Access SQLite database.
     'HEADER_SEARCH_PATHS' => 'SQLCipher'
   }
   s.swift_version = '5.0'
+  s.resource_bundles = {'sqflite_sqlcipher_ios_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
 end
