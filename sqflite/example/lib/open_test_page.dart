@@ -116,6 +116,7 @@ Future<bool> isDatabase(String path, {String? password}) async {
   var isDatabase = false;
   try {
     db = await openReadOnlyDatabase(path, password: password);
+    await db.rawQuery('SELECT * FROM sqlite_master');
     isDatabase = true;
   } catch (_) {} finally {
     await db?.close();

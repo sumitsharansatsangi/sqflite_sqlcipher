@@ -226,26 +226,34 @@ class _MyHomePageState extends State<MyHomePage> {
                   context: context,
                   builder: (context) => AlertDialog(
                     title: Text('Info'),
-                    content: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          'SQLcipher version:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                    content: SizedBox(
+                      width: 400,
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(
+                                'SQLcipher version:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                version,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                'Compile options:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text(compileOptions),
+                            ],
+                          ),
                         ),
-                        Text(
-                          version,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'Compile options:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(compileOptions),
-                      ],
+                      ),
                     ),
                   ),
                 );
