@@ -20,7 +20,7 @@ class Sqflite {
   //static MethodChannel get _channel => channel;
 
   /// deprecated
-  @deprecated
+  @Deprecated('internal use only')
   static Future<String?> get platformVersion =>
       invokeMethod<String>(methodGetPlatformVersion);
 
@@ -39,15 +39,15 @@ class Sqflite {
   ///
   /// To use during developpment/debugging
   /// Set extra dart and nativate debug logs
-  @deprecated
+  @Deprecated('Debug only')
   static Future<void> devSetDebugModeOn([bool on = true]) {
     impl.debugModeOn = on;
     return setDebugModeOn(on);
   }
 
-  @deprecated
 
   /// Testing only
+  @Deprecated('Testing only')
   static Future<void> devInvokeMethod(String method,
       [dynamic arguments]) async {
     await invokeMethod<dynamic>(method, arguments);

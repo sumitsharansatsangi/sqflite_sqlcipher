@@ -1,4 +1,4 @@
-/// Explicit list of needed private import
+// Explicit list of needed private import
 export 'package:sqflite_common/src/constant.dart' // ignore: implementation_imports
     show
         methodOpenDatabase,

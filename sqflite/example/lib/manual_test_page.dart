@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart' hide MenuItem;
+import 'package:flutter/material.dart';
 import 'package:sqflite_common/utils/utils.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:sqflite_sqlcipher/src/sqflite_import.dart' as impl;
@@ -39,10 +39,6 @@ class _ManualTestPageState extends State<ManualTestPage> {
 
   late List<MenuItem> items;
   late List<ItemWidget> itemWidgets;
-
-  Future<bool> pop() async {
-    return true;
-  }
 
   @override
   void didChangeDependencies() {
@@ -107,11 +103,9 @@ class _ManualTestPageState extends State<ManualTestPage> {
       appBar: AppBar(
         title: Text('Manual tests'),
       ),
-      body: WillPopScope(
-          child: ListView(
-            children: itemWidgets,
-          ),
-          onWillPop: pop),
+      body: ListView(
+        children: itemWidgets,
+      ),
     );
   }
 }

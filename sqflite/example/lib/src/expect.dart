@@ -5,7 +5,6 @@
 import 'dart:async';
 
 import 'package:matcher/matcher.dart';
-import 'package:meta/meta.dart';
 
 /// An exception thrown when a test assertion fails.
 class TestFailure extends Error {
@@ -113,13 +112,12 @@ Future<void> _expect(actual, matcher,
   }
 
   final errorStr = formatter(actual, matcher as Matcher, reason, matchState, verbose);
-  print("Error str: $errorStr");
+  print('Error str: $errorStr');
   fail(errorStr);
 }
 
 /// Convenience method for throwing a new [TestFailure] with the provided
 /// [message].
-@alwaysThrows
 Never fail([String? message]) => throw TestFailure(message ?? 'should fail');
 
 /// index text helper.
