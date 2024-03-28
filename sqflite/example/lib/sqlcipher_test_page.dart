@@ -25,16 +25,13 @@ class SqlCipherTestPage extends TestPage {
         onCreate: (db, version) async {
           var batch = db.batch();
 
-          batch
-              .execute('CREATE TABLE Test (id INTEGER PRIMARY KEY, text NAME)');
+          batch.execute('CREATE TABLE Test (id INTEGER PRIMARY KEY, text NAME)');
           await batch.commit();
         },
       );
 
       try {
-        expect(
-            await db.rawInsert('INSERT INTO Test (text) VALUES (?)', ['test']),
-            1);
+        expect(await db.rawInsert('INSERT INTO Test (text) VALUES (?)', ['test']), 1);
         var result = await db.query('Test');
         var expected = [
           {'id': 1, 'text': 'test'}
@@ -49,22 +46,11 @@ class SqlCipherTestPage extends TestPage {
     });
 
     test('Open asset database', () async {
-      var databasesPath = await getDatabasesPath();
-      var path = join(databasesPath, 'asset_example.db');
-
-      // delete existing if any
-      await deleteDatabase(path);
-
-      // Make sure the parent directory exists
-      try {
-        await Directory(dirname(path)).create(recursive: true);
-      } catch (_) {}
+      var path = await initDeleteDb('asset_example.db');
 
       // Copy from asset
-      var data =
-          await rootBundle.load(join('assets', 'example_pass_1234.db'));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      var data = await rootBundle.load(join('assets', 'example_pass_1234.db'));
+      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       // Write and flush the bytes written
       await File(path).writeAsBytes(bytes, flush: true);
 
@@ -78,24 +64,31 @@ class SqlCipherTestPage extends TestPage {
 
       await db.close();
     });
-    test('Open asset database (SQLCipher 3.x, cipher_migrate on Android)',
-        () async {
-      var databasesPath = await getDatabasesPath();
-      var path = join(databasesPath, 'asset_example_3x.db');
 
-      // delete existing if any
-      await deleteDatabase(path);
-
-      // Make sure the parent directory exists
-      try {
-        await Directory(dirname(path)).create(recursive: true);
-      } catch (_) {}
+    test('Wrong password', () async {
+      var path = await initDeleteDb('asset_example.db');
 
       // Copy from asset
-      var data =
-          await rootBundle.load(join('assets', 'sqlcipher-3.0-testkey.db'));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      var data = await rootBundle.load(join('assets', 'example_pass_1234.db'));
+      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      // Write and flush the bytes written
+      await File(path).writeAsBytes(bytes, flush: true);
+
+      try {
+        // open the database with the wrong password
+        await openDatabase(path, password: 'abc');
+        fail('Should trhow');
+      } on DatabaseException catch (e) {
+        expect(e.toString().contains('open_failed'), isTrue);
+      }
+    });
+
+    test('Open asset database (SQLCipher 3.x, cipher_migrate on Android)', () async {
+      var path = await initDeleteDb('asset_example.db');
+
+      // Copy from asset
+      var data = await rootBundle.load(join('assets', 'sqlcipher-3.0-testkey.db'));
+      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       // Write and flush the bytes written
       await File(path).writeAsBytes(bytes, flush: true);
 
@@ -110,26 +103,23 @@ class SqlCipherTestPage extends TestPage {
     });
 
     test('Open an unencrypted database with the package sqflite', () async {
-      String path = await initDeleteDb("unencrypted.db");
+      var path = await initDeleteDb('unencrypted.db');
 
-      Database db = await sqflite.openDatabase(
+      var db = await sqflite.openDatabase(
         path,
         version: 1,
         onCreate: (db, version) async {
-          Batch batch = db.batch();
+          var batch = db.batch();
 
-          batch
-              .execute("CREATE TABLE Test (id INTEGER PRIMARY KEY, text NAME)");
+          batch.execute('CREATE TABLE Test (id INTEGER PRIMARY KEY, text NAME)');
           await batch.commit();
         },
       );
 
       try {
-        expect(
-            await db.rawInsert("INSERT INTO Test (text) VALUES (?)", ['test']),
-            1);
-        var result = await db.query("Test");
-        List expected = [
+        expect(await db.rawInsert('INSERT INTO Test (text) VALUES (?)', ['test']), 1);
+        var result = await db.query('Test');
+        var expected = [
           {'id': 1, 'text': 'test'}
         ];
         expect(result, expected);
