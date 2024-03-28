@@ -2,12 +2,15 @@ package com.davidmartos96.sqflite_sqlcipher;
 
 import android.util.Log;
 
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteDatabaseHook;
-import net.sqlcipher.DatabaseErrorHandler;
+
 import java.io.File;
 
 import static com.davidmartos96.sqflite_sqlcipher.Constant.TAG;
+
+import net.zetetic.database.DatabaseErrorHandler;
+import net.zetetic.database.sqlcipher.SQLiteConnection;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabaseHook;
 
 class Database {
     final boolean singleInstance;
@@ -53,22 +56,28 @@ class Database {
 
     private void openWithFlags(int flags, DatabaseErrorHandler errorHandler) {
         try {
-            sqliteDatabase = SQLiteDatabase.openDatabase(path, password, null, flags, null, errorHandler);
+            sqliteDatabase = SQLiteDatabase.openDatabase(path, password, null, flags, errorHandler, null);
 
         }catch (Exception e) {
             Log.d(TAG, "Opening db in " + path + " with PRAGMA cipher_migrate");
             SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
                 @Override
-                public void preKey(net.sqlcipher.database.SQLiteDatabase database) {
+                public void preKey(SQLiteConnection database) {
+
                 }
 
                 @Override
-                public void postKey(net.sqlcipher.database.SQLiteDatabase database) {
-                    database.rawExecSQL("PRAGMA cipher_migrate;");
+                public void postKey(SQLiteConnection database) {
+                    long migrateRes = database.executeForLong("PRAGMA cipher_migrate;", null, null);
+
+                    if (migrateRes != 0) {
+                        // Throw the original exception, assuming a wrong password was provided
+                        throw e;
+                    }
                 }
             };
 
-            sqliteDatabase = SQLiteDatabase.openDatabase(path, password, null, flags, hook, errorHandler);
+            sqliteDatabase = SQLiteDatabase.openDatabase(path, password, null, flags, errorHandler, hook);
         }
     }
 

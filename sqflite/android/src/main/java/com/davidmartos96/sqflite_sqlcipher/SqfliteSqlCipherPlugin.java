@@ -4,10 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 
-import net.sqlcipher.database.SQLiteDatabase;
-
 import android.database.SQLException;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
+import android.database.sqlite.SQLiteException;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -66,6 +65,8 @@ import static com.davidmartos96.sqflite_sqlcipher.Constant.PARAM_SQL;
 import static com.davidmartos96.sqflite_sqlcipher.Constant.PARAM_SQL_ARGUMENTS;
 import static com.davidmartos96.sqflite_sqlcipher.Constant.TAG;
 
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
+
 /**
  * SqfliteSqlCipherPlugin Android implementation
  */
@@ -98,7 +99,7 @@ public class SqfliteSqlCipherPlugin implements FlutterPlugin, MethodCallHandler 
 
     private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger) {
         this.context = applicationContext;
-        SQLiteDatabase.loadLibs(applicationContext);
+        System.loadLibrary("sqlcipher");
         methodChannel = new MethodChannel(messenger, Constant.PLUGIN_KEY);
         methodChannel.setMethodCallHandler(this);
     }
@@ -615,18 +616,19 @@ public class SqfliteSqlCipherPlugin implements FlutterPlugin, MethodCallHandler 
     }
 
     private void handleException(Exception exception, Operation operation, Database database) {
+
         if (exception instanceof SQLiteCantOpenDatabaseException) {
             operation.error(Constant.SQLITE_ERROR, Constant.ERROR_OPEN_FAILED + " " + database.path, null);
             return;
-        } else if (exception.getMessage().toLowerCase().contains("could not open database")) {
-            operation.error(Constant.SQLITE_ERROR, Constant.ERROR_OPEN_FAILED + " " + database.path, null);
-            return;
-        } else if (exception.getMessage().toLowerCase().contains("file is not a database")) {
-            operation.error(Constant.SQLITE_ERROR, Constant.ERROR_OPEN_FAILED + " " + database.path, null);
-            return;
-        } else if (exception instanceof SQLException) {
-            operation.error(Constant.SQLITE_ERROR, exception.getMessage(), SqlErrorInfo.getMap(operation));
-            return;
+        } else if(exception instanceof SQLiteException) {
+            final String message = exception.getMessage();
+            if (message != null) {
+                final String lower = message.toLowerCase();
+                if (lower.contains("could not open database") || lower.contains("file is not a database")) {
+                    operation.error(Constant.SQLITE_ERROR, Constant.ERROR_OPEN_FAILED + " " + database.path, null);
+                    return;
+                }
+            }
         }
         operation.error(Constant.SQLITE_ERROR, exception.getMessage(), SqlErrorInfo.getMap(operation));
     }
