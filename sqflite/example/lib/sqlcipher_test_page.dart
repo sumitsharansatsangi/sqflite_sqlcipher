@@ -79,6 +79,7 @@ class SqlCipherTestPage extends TestPage {
         await openDatabase(path, password: 'abc');
         fail('Should trhow');
       } on DatabaseException catch (e) {
+        print('error captured: $e');
         expect(e.toString().contains('open_failed'), isTrue);
       }
     });
