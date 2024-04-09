@@ -1,3 +1,11 @@
+## 3.0.0
+* Update SQLCipher version to [4.5.6](https://www.zetetic.net/blog/2024/01/17/sqlcipher-4.5.6-release/)
+* Android minimum required SDK 21 and use `compileSdk` 34.
+* Ensure the provided password is valid when opening the database. This now makes it possible to differentiate between failing to cipher_migrate and opening a database with the wrong password.
+* On iOS/macOS, if you have sqflite as a transitive dependency with version 2.3.2 or greater, the `fmdb_override` workaround in the `dependency_overrides` is not needed anymore.
+* Add iOS/MacOS privacy manifest
+* Dart >= 3.3.0
+
 ## 2.2.1
 * Update minimum deployment targets for iOS (11.0) and macOS (10.13) to use SQLCipher 4.5.4
 
