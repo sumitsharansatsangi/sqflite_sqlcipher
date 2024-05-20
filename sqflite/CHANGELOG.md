@@ -1,3 +1,6 @@
+## 3.1.0
+* Update SQLCipher version to [4.5.7](https://www.zetetic.net/blog/2024/04/24/sqlcipher-4.5.7-release/)
+
 ## 3.0.0
 * Update SQLCipher version to [4.5.6](https://www.zetetic.net/blog/2024/01/17/sqlcipher-4.5.6-release/)
 * Android minimum required SDK 21 and use `compileSdk` 34.
